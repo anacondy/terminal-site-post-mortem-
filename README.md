@@ -1,52 +1,105 @@
-project structure 
+# Terminal Archives - Previous Year Papers
 
-app.py
-templates/
-          index.html
-          upload.html
-static/
-         style.css
-         script/js
+A clean, terminal-style web application for storing and searching exam papers with intelligent search functionality and secure admin uploads.
 
-         
-          //or 
+## Project Structure
 
-app.py
-templates/
-         index.html
-         upload.html
-         login.html
-static/
-        style.css
-        script/js
-        upload.js
-database.py
-create_admin.py
-uploads
+```
+terminal-site-post-mortem-/
+├── app.py              # Main Flask application
+├── database.py         # Database initialization and helpers
+├── create_admin.py     # Script to create admin users
+├── requirements.txt    # Python dependencies
+├── templates/          # HTML templates
+│   ├── index.html      # Main terminal interface
+│   ├── upload.html     # Admin multi-file upload page
+│   └── login.html      # Admin login page
+├── static/             # Static assets
+│   ├── style.css       # Main stylesheet
+│   ├── script.js       # Terminal UI and search logic
+│   └── upload.js       # Upload form logic
+└── uploads/            # Directory for uploaded PDFs
+```
 
-site features & fucntionalities ---
+## Features & Functionality
 
+### Core Functionality
+- **SQLite Database Integration** ✅ - Fast, scalable database for storing paper metadata
+- **Secure Admin Login (Username/Password)** ✅ - Password-protected admin access with hashed credentials
+- **Intelligent Search Engine** ✅ - Smart search with synonym support (sem, phy, 3rd, etc.) and case-insensitive matching
+- **Direct PDF Viewing** ✅ - PDFs open directly in the browser
 
-The fully working, intelligent search with all the shortcuts.
+### Admin Page Features  
+- **Multi-File Drag & Drop Upload** ✅ - Upload multiple PDFs efficiently at once
+- **Form Validation (Required Fields)** ✅ - Prevents uploads with missing required information
+- **Duplicate File Handling** ✅ - Automatic file renaming to prevent overwrites
+- **Comprehensive Form Fields** ✅ - All necessary fields including time, marks, university, etc.
 
-The secure "Alvido" login with a username and password.
+### UI & UX Features
+- **Classic Left-Aligned Terminal UI** ✅ - Clean, effective terminal-style interface
+- **Smooth "Marquee" Progress Bar** ✅ - Animated progress indicator
+- **Ctrl+K Search Shortcut** ✅ - Quick keyboard access to search
+- **Click-Away Search Dismissal** ✅ - Search modal closes when clicking outside
+- **"upload" Keyword Shortcut** ✅ - Type "upload" in search to go directly to admin login
 
-The advanced multi-file upload page.
+## Setup Instructions
 
-Feature / Idea	Status	Notes / Outcome
-Core Functionality		
-SQLite Database Integration	✅	Success. The site now runs on a fast, scalable database. This is a huge win.
-Secure Admin Login (Username/Password)	✅	Success. We replaced the insecure name check with a professional, password-protected login page.
-Intelligent Search Engine (TRANSLATION_MAP)	✅	Success. The search is smart and understands synonyms (sem, phy, 3rd, etc.) and is case-insensitive.
-Admin Page Features		
-Multi-File Drag & Drop Upload	✅	Success. The admin page is now a powerful tool for uploading multiple files efficiently.
-Form Validation (Required Fields)	✅	Success. The multi-upload page correctly prevents uploads if required information is missing.
-Duplicate File Handling	✅	Success. The server now intelligently renames files to prevent duplicates from being overwritten.
-All New Form Fields (Time, Marks, etc.)	✅	Success. All the compulsory and optional fields you requested have been added.
-UI & UX Features		
-Classic Left-Aligned Terminal UI	✅	Success. The original UI was clean and effective. We are keeping this layout.
-Smooth "Marquee" Progress Bar	✅	Success. The original "back and forth" progress bar animation was great. We are keeping it.
-"Click-Away" Search Bar Disappear	✅	Success. The search bar fades out smoothly when you click away. This is good UX.
-"F+S" Info Overlay & Animation	❌	Failed. This feature introduced layout bugs (bad spacing) and inconsistent animations. We are removing it.
-Centered Layout (Home & Admin)	❌	Failed. You didn't like the look and feel. We are removing all centering styles.
-Mobile-Specific UI	➖	Skipped. While we tried, it complicated the desktop experience. We are reverting to a clean, desktop-first design.
+### 1. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Create Admin User
+
+Run the admin creation script to set up your first admin account:
+
+```bash
+python create_admin.py
+```
+
+You'll be prompted to enter a username and password.
+
+### 3. Run the Application
+
+```bash
+python app.py
+```
+
+The application will start on `http://localhost:5000`
+
+### 4. Access the Site
+
+- **Main page**: http://localhost:5000 - View and search papers
+- **Admin login**: http://localhost:5000/login - Admin authentication
+- **Admin upload**: http://localhost:5000/admin - Upload papers (requires login)
+
+## Usage
+
+### Searching Papers
+1. Press `Ctrl+K` on the main page to open the search modal
+2. Enter search terms (e.g., "Physics 2024" or "BSc 3rd sem")
+3. The intelligent search understands shortcuts like:
+   - `phy` = Physics
+   - `3` or `3rd` or `III` = Third semester
+   - `sem` = semester
+4. Click on any result to view the PDF directly in your browser
+
+### Admin Upload Shortcut
+- Type "upload" in the search box to be redirected to the admin login page
+
+### Uploading Papers
+1. Log in at `/login` with your admin credentials
+2. Drag and drop PDF files or click to select files
+3. Fill in the required information for each paper:
+   - Required: Name, Class, Subject, Semester, Year, Exam Type, Medium
+   - Optional: Exam Number, Paper Code, University, Time, Max Marks
+4. Click "Upload All Pending Files" to submit
+
+## Technical Details
+
+- **Framework**: Flask 2.3.3
+- **Database**: SQLite3
+- **Frontend**: Vanilla JavaScript, CSS3
+- **Security**: Werkzeug password hashing
+- **File Handling**: Secure filename generation with unique prefixes
