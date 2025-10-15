@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Multi-File Upload</title>
+    <style>
+        :root { --primary-color: #4CAF50; --bg-color-1: #1a1a1a; --bg-color-2: #2a2a2a; --bg-color-3: #333; --border-color: #555; --text-color: #e0e0e0; --error-color: #d9534f; }
+        body { font-family: sans-serif; background-color: var(--bg-color-1); color: var(--text-color); margin: 0; padding: 2rem; }
+        .upload-container { border: 2px dashed var(--border-color); border-radius: 10px; padding: 2rem; text-align: center; color: #888; margin-bottom: 2rem; transition: background-color 0.3s, border-color 0.3s; }
+        .upload-container.drag-over { background-color: var(--bg-color-2); border-color: var(--primary-color); }
+        .upload-container p { font-size: 1.2rem; }
+        .upload-controls { text-align: center; margin-bottom: 2rem; }
+        #upload-all-btn { background-color: var(--primary-color); color: white; padding: 12px 25px; border: none; border-radius: 5px; font-size: 1.1rem; cursor: pointer; transition: background-color 0.3s; }
+        #upload-all-btn:hover { background-color: #45a049; }
+        #forms-wrapper { display: flex; gap: 1.5rem; padding-bottom: 1.5rem; overflow-x: auto; scroll-snap-type: x mandatory; }
+        .form-card { background-color: var(--bg-color-3); padding: 1.5rem; border-radius: 8px; min-width: 400px; scroll-snap-align: start; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-left: 5px solid var(--border-color); transition: border-left-color 0.3s; }
+        .form-card h3 { color: var(--primary-color); margin-top: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+        .status-indicator { font-size: 0.8rem; text-align: center; padding: 3px; border-radius: 3px; background-color: #555; color: white; margin-bottom: 1rem; font-weight: bold; transition: background-color 0.3s; }
+        label { display: block; margin-top: 10px; margin-bottom: 5px; color: #bbb; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 8px; margin-bottom: 8px; background-color: var(--bg-color-2); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; box-sizing: border-box; }
+        .hidden-datalists { display: none; }
+        .form-card.form-error { border-left-color: var(--error-color); }
+    </style>
+</head>
+<body>
+    <div class="upload-container" id="drop-zone">
+        <p>Drag & Drop PDF files here</p>
+        <p>or</p>
+        <input type="file" id="file-input" multiple accept=".pdf" style="display: none;">
+        <label for="file-input" style="cursor: pointer; background-color: var(--primary-color); color: white; padding: 10px 15px; border-radius: 4px;">Select Files</label>
+    </div>
+
+    <div class="upload-controls">
+        <button id="upload-all-btn">Upload All Pending Files</button>
+    </div>
+
+    <div id="forms-wrapper">
+        </div>
+
+    <div class="hidden-datalists">
+        <datalist id="universities"> <option value="University of Rajasthan"></option> <option value="S.S Jain Subodh (Auto) College"></option> </datalist>
+        <datalist id="paper_counts"> <option value="First Paper (1)"></option> <option value="Second Paper (2)"></option> <option value="Third Paper (3)"></option> <option value="Fourth Paper (4)"></option> <option value="Fifth Paper (5)"></option> </datalist>
+        <datalist id="years"> <option value="2025"></option> <option value="2024"></option> <option value="2023"></option> <option value="2022"></option> <option value="2021"></option> <option value="2020"></option> </datalist>
+        <datalist id="times"> <option value="1 hr"></option> <option value="1 hr 30 min"></option> <option value="2 hr"></option> <option value="2 hr 30 min"></option> <option value="3 hr"></option> <option value="3 hr 30 min"></option> </datalist>
+        <datalist id="marks"> <option value="20"></option> <option value="54"></option> <option value="80"></option> <option value="100"></option> </datalist>
+    </div>
+
+    <script src="{{ url_for('static', filename='upload.js') }}"></script>
+</body>
+</html>
