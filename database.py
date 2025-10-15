@@ -9,15 +9,25 @@ def init_db():
     # Create the 'papers' table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS papers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT, class TEXT NOT NULL, subject TEXT NOT NULL,
-            semester TEXT NOT NULL, exam_year TEXT NOT NULL, exam_type TEXT NOT NULL,
-            paper_code TEXT, exam_number TEXT, medium TEXT NOT NULL, university TEXT,
-            time TEXT, max_marks TEXT, uploader_name TEXT NOT NULL, filename TEXT NOT NULL UNIQUE,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            class TEXT NOT NULL,
+            subject TEXT NOT NULL,
+            semester TEXT NOT NULL,
+            exam_year TEXT NOT NULL,
+            exam_type TEXT NOT NULL,
+            paper_code TEXT,
+            exam_number TEXT,
+            medium TEXT NOT NULL,
+            university TEXT,
+            time TEXT,
+            max_marks TEXT,
+            uploader_name TEXT NOT NULL,
+            filename TEXT NOT NULL UNIQUE,
             upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     
-    # NEW: Create the 'users' table for storing admin credentials
+    # Create the 'users' table for storing admin credentials
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
