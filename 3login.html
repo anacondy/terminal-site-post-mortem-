@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login</title>
+    <style>
+        :root { --primary-color: #4CAF50; --bg-color-1: #1a1a1a; --bg-color-2: #2a2a2a; --bg-color-3: #333; --border-color: #555; --text-color: #e0e0e0; --error-color: #d9534f; }
+        body { font-family: sans-serif; background-color: var(--bg-color-1); color: var(--text-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        form { background-color: var(--bg-color-3); padding: 2rem 3rem; border-radius: 8px; max-width: 400px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; }
+        h1 { color: var(--primary-color); }
+        .flash-error { color: var(--error-color); background-color: rgba(217, 83, 79, 0.2); padding: 10px; border-radius: 4px; margin-bottom: 1rem; }
+        label { display: block; text-align: left; margin-top: 15px; margin-bottom: 5px; color: #bbb; }
+        input { width: 100%; padding: 10px; margin-bottom: 10px; background-color: var(--bg-color-2); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; box-sizing: border-box; }
+        input[type="submit"] { background-color: var(--primary-color); color: white; border: none; cursor: pointer; margin-top: 20px; font-weight: bold; }
+        input[type="submit"]:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+    <form method="post">
+        <h1>Admin Login</h1>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-error">{{ messages[0] }}</div>
+            {% endif %}
+        {% endwith %}
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username" required>
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required>
+        <input type="submit" value="Log In">
+    </form>
+</body>
+</html>
