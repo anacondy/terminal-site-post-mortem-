@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchModal = document.getElementById('search-modal');
     const searchInput = document.getElementById('search-input');
     
-    // Ctrl+K to open search, Esc to close
+    // Ctrl+K to open search, Esc to close, F+S to show uploader details
     document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') { 
             e.preventDefault(); 
@@ -14,7 +14,20 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.key === 'Escape') { 
             if (!searchModal.classList.contains('hidden')) { 
                 searchModal.classList.add('hidden'); 
-            } 
+            }
+            // Close uploader details modal if open
+            const detailsModal = document.getElementById('uploader-details-modal');
+            if (detailsModal && !detailsModal.classList.contains('hidden')) {
+                detailsModal.classList.add('hidden');
+            }
+        }
+        // F+S shortcut to show uploader details for paper links
+        if (e.key === 'f' || e.key === 'F') {
+            const paperLinks = document.querySelectorAll('.paper-link');
+            if (paperLinks.length > 0) {
+                e.preventDefault();
+                showUploaderDetails();
+            }
         }
     });
 
@@ -44,27 +57,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 addLine(`Found <span class="highlight">${results.length}</span> result(s):`);
                 results.forEach(paper => {
                     const title = `${paper.class} ${paper.subject} (Sem ${paper.semester}) - ${paper.exam_year}`;
-                    const resultHTML = `
-                        <div class="search-result">
-                            <span>[${paper.exam_year}]</span> 
-                            <a href="${paper.url}" class="paper-link" target="_blank" 
-                               data-uploader="${paper.uploader_name}" 
-                               data-date="${paper.upload_date}">
-                               ${title}
-                            </a>
-                        </div>
-                    `;
+                    const resultHTML = `<div class="search-result"><span>[${paper.exam_year}]</span> <a href="${paper.url}" class="paper-link" target="_blank" data-uploader="${paper.uploader_name}" data-date="${paper.upload_date}">${title}</a></div>`;
                     addLine(resultHTML);
                 });
+                addLine(`<br/><span class="desktop-only">// Press F to view uploader details, Ctrl + K to search again.</span>`);
             } else { 
                 addLine('No results found for your query.'); 
+                addLine(`<br/><span class="desktop-only">// Press Ctrl + K to search again.</span>`);
             }
         } catch (error) { 
             addLine('// Error connecting to the search API.', 'comment'); 
             console.error('Fetch error:', error);
         }
-        
-        addLine(`<br/><span class="desktop-only">// Press Ctrl + K to search again.</span>`);
     }
 
     // Helper functions
@@ -113,6 +117,58 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => { 
             window.location.href = '/login'; 
         }, 1000); 
+    }
+    
+    // Show uploader details with blur effect
+    function showUploaderDetails() {
+        const paperLinks = document.querySelectorAll('.paper-link');
+        if (paperLinks.length === 0) return;
+        
+        // Create modal if it doesn't exist
+        let detailsModal = document.getElementById('uploader-details-modal');
+        if (!detailsModal) {
+            detailsModal = document.createElement('div');
+            detailsModal.id = 'uploader-details-modal';
+            detailsModal.className = 'hidden';
+            document.body.appendChild(detailsModal);
+        }
+        
+        // Build details content
+        let detailsHTML = '<div class="uploader-details-box"><h3>Paper Upload Details</h3>';
+        paperLinks.forEach((link, index) => {
+            const uploader = link.getAttribute('data-uploader') || 'Unknown';
+            const uploadDate = link.getAttribute('data-date') || 'Unknown';
+            const title = link.textContent.trim();
+            
+            // Parse date to show month and year
+            let displayDate = 'Unknown';
+            if (uploadDate && uploadDate !== 'Unknown') {
+                const date = new Date(uploadDate);
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                displayDate = `${months[date.getMonth()]} ${date.getFullYear()}`;
+            }
+            
+            detailsHTML += `
+                <div class="uploader-detail-item">
+                    <div class="detail-title">${title}</div>
+                    <div class="detail-info">
+                        <span class="detail-uploader">Uploader: <span class="highlight">${uploader}</span></span>
+                        <span class="detail-date">Date: <span class="highlight">${displayDate}</span></span>
+                    </div>
+                </div>
+            `;
+        });
+        detailsHTML += '<p class="modal-hint">Press Esc to close</p></div>';
+        
+        detailsModal.innerHTML = detailsHTML;
+        detailsModal.classList.remove('hidden');
+        
+        // Click to close
+        detailsModal.addEventListener('click', (e) => {
+            if (e.target === detailsModal) {
+                detailsModal.classList.add('hidden');
+            }
+        });
     }
     
     // Startup sequence
