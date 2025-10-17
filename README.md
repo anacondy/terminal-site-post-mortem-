@@ -103,3 +103,5 @@ The application will start on `http://localhost:5000`
 - **Frontend**: Vanilla JavaScript, CSS3
 - **Security**: Werkzeug password hashing
 - **File Handling**: Secure filename generation with unique prefixes
+
+Made with love and a twist by [Puppy pilot](https://github.com/copilot) and [@anacondy](https://github.com/anacondy) - for those who read between the logs.
