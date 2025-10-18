@@ -1,4 +1,4 @@
-﻿# Terminal Archives - Previous Year Papers
+# Terminal Archives - Previous Year Papers
 
 A clean, terminal-style web application for storing and searching exam papers with intelligent search functionality and secure admin uploads.
 
@@ -6,41 +6,41 @@ A clean, terminal-style web application for storing and searching exam papers wi
 
 ```
 terminal-site-post-mortem-/
-â”œâ”€â”€ app.py              # Main Flask application
-â”œâ”€â”€ database.py         # Database initialization and helpers
-â”œâ”€â”€ create_admin.py     # Script to create admin users
-â”œâ”€â”€ requirements.txt    # Python dependencies
-â”œâ”€â”€ templates/          # HTML templates
-â”‚   â”œâ”€â”€ index.html      # Main terminal interface
-â”‚   â”œâ”€â”€ upload.html     # Admin multi-file upload page
-â”‚   â””â”€â”€ login.html      # Admin login page
-â”œâ”€â”€ static/             # Static assets
-â”‚   â”œâ”€â”€ style.css       # Main stylesheet
-â”‚   â”œâ”€â”€ script.js       # Terminal UI and search logic
-â”‚   â””â”€â”€ upload.js       # Upload form logic
-â””â”€â”€ uploads/            # Directory for uploaded PDFs
+├── app.py              # Main Flask application
+├── database.py         # Database initialization and helpers
+├── create_admin.py     # Script to create admin users
+├── requirements.txt    # Python dependencies
+├── templates/          # HTML templates
+│   ├── index.html      # Main terminal interface
+│   ├── upload.html     # Admin multi-file upload page
+│   └── login.html      # Admin login page
+├── static/             # Static assets
+│   ├── style.css       # Main stylesheet
+│   ├── script.js       # Terminal UI and search logic
+│   └── upload.js       # Upload form logic
+└── uploads/            # Directory for uploaded PDFs
 ```
 
 ## Features & Functionality
 
 ### Core Functionality
-- **SQLite Database Integration** âœ… - Fast, scalable database for storing paper metadata
-- **Secure Admin Login (Username/Password)** âœ… - Password-protected admin access with hashed credentials
-- **Intelligent Search Engine** âœ… - Smart search with synonym support (sem, phy, 3rd, etc.) and case-insensitive matching
-- **Direct PDF Viewing** âœ… - PDFs open directly in the browser
+- **SQLite Database Integration** ✅ - Fast, scalable database for storing paper metadata
+- **Secure Admin Login (Username/Password)** ✅ - Password-protected admin access with hashed credentials
+- **Intelligent Search Engine** ✅ - Smart search with synonym support (sem, phy, 3rd, etc.) and case-insensitive matching
+- **Direct PDF Viewing** ✅ - PDFs open directly in the browser
 
 ### Admin Page Features  
-- **Multi-File Drag & Drop Upload** âœ… - Upload multiple PDFs efficiently at once
-- **Form Validation (Required Fields)** âœ… - Prevents uploads with missing required information
-- **Duplicate File Handling** âœ… - Automatic file renaming to prevent overwrites
-- **Comprehensive Form Fields** âœ… - All necessary fields including time, marks, university, etc.
+- **Multi-File Drag & Drop Upload** ✅ - Upload multiple PDFs efficiently at once
+- **Form Validation (Required Fields)** ✅ - Prevents uploads with missing required information
+- **Duplicate File Handling** ✅ - Automatic file renaming to prevent overwrites
+- **Comprehensive Form Fields** ✅ - All necessary fields including time, marks, university, etc.
 
 ### UI & UX Features
-- **Classic Left-Aligned Terminal UI** âœ… - Clean, effective terminal-style interface
-- **Smooth "Marquee" Progress Bar** âœ… - Animated progress indicator
-- **Ctrl+K Search Shortcut** âœ… - Quick keyboard access to search
-- **Click-Away Search Dismissal** âœ… - Search modal closes when clicking outside
-- **"upload" Keyword Shortcut** âœ… - Type "upload" in search to go directly to admin login
+- **Classic Left-Aligned Terminal UI** ✅ - Clean, effective terminal-style interface
+- **Smooth "Marquee" Progress Bar** ✅ - Animated progress indicator
+- **Ctrl+K Search Shortcut** ✅ - Quick keyboard access to search
+- **Click-Away Search Dismissal** ✅ - Search modal closes when clicking outside
+- **"upload" Keyword Shortcut** ✅ - Type "upload" in search to go directly to admin login
 
 ## Setup Instructions
 
