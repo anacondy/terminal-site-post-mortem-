@@ -104,5 +104,9 @@ The application will start on `http://localhost:5000`
 - **Security**: Werkzeug password hashing
 - **File Handling**: Secure filename generation with unique prefixes
 
+## Additional Resources
+
+- **[SWOT PR Guide](SWOT_PR_GUIDE.md)** - Comprehensive guide explaining the SWOT PR #2 issue and how to properly submit your college to the JetBrains SWOT database
+
 Made with <3 and a twist by Puppy pilot and @anacondy - for those who read between the logs.
 
