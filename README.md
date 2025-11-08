@@ -1,6 +1,37 @@
 # Terminal Archives - Previous Year Papers
 
+🌐 **Live Demo:** [View on GitHub Pages](https://anacondy.github.io/terminal-site-post-mortem-/) *(Configure in repository settings)*
+
 A clean, terminal-style web application for storing and searching exam papers with intelligent search functionality and secure admin uploads.
+
+## 📸 Screenshots
+
+### Desktop View
+![Terminal Main Interface](https://github.com/user-attachments/assets/70ee735b-9b91-4936-b975-2ca5107e17b6)
+
+### Search Modal
+![Search Interface](https://github.com/user-attachments/assets/cec5c47f-9262-473e-b092-7f45b56c6298)
+
+### Mobile View (16:9 & 20:9 Optimized)
+<img src="https://github.com/user-attachments/assets/d8cb0722-84d8-4f04-b779-053622bf573f" width="300" alt="Mobile 16:9 View">
+
+### Offline/Error Page
+![Offline Page](https://github.com/user-attachments/assets/09bbc17b-d07b-4953-a020-d4636743ccde)
+
+## 💾 GitHub Storage Information
+
+When hosting this project on GitHub:
+
+- **Repository Size Limit:** 1 GB recommended (soft limit)
+- **Individual File Size:** Max 100 MB per file
+- **GitHub Pages Bandwidth:** 100 GB per month (soft limit)
+- **GitHub Pages Site Size:** 1 GB recommended
+
+**For Document/Paper Storage:**
+- Store PDFs in the `uploads/` directory
+- Use Git LFS (Large File Storage) for files over 50 MB
+- Consider external storage (AWS S3, Google Cloud Storage) for large collections
+- Each PDF should ideally be under 10 MB for optimal performance
 
 ## Project Structure
 
@@ -13,11 +44,15 @@ terminal-site-post-mortem-/
 ├── templates/          # HTML templates
 │   ├── index.html      # Main terminal interface
 │   ├── upload.html     # Admin multi-file upload page
-│   └── login.html      # Admin login page
+│   ├── login.html      # Admin login page
+│   └── offline.html    # Offline/error fallback page
 ├── static/             # Static assets
-│   ├── style.css       # Main stylesheet
+│   ├── style.css       # Main stylesheet with mobile optimizations
 │   ├── script.js       # Terminal UI and search logic
-│   └── upload.js       # Upload form logic
+│   ├── upload.js       # Upload form logic
+│   ├── sw.js           # Service Worker for offline support
+│   └── images/         # Image assets
+│       └── offline.jpg # Offline page illustration
 └── uploads/            # Directory for uploaded PDFs
 ```
 
@@ -28,6 +63,7 @@ terminal-site-post-mortem-/
 - **Secure Admin Login (Username/Password)** ✅ - Password-protected admin access with hashed credentials
 - **Intelligent Search Engine** ✅ - Smart search with synonym support (sem, phy, 3rd, etc.) and case-insensitive matching
 - **Direct PDF Viewing** ✅ - PDFs open directly in the browser
+- **Offline Support** ✅ - Service Worker enables offline functionality with custom error page
 
 ### Admin Page Features  
 - **Multi-File Drag & Drop Upload** ✅ - Upload multiple PDFs efficiently at once
@@ -37,10 +73,14 @@ terminal-site-post-mortem-/
 
 ### UI & UX Features
 - **Classic Left-Aligned Terminal UI** ✅ - Clean, effective terminal-style interface
+- **Smooth Animations & Transitions** ✅ - Fade-in effects, smooth scrolling, and polished interactions
+- **Mobile Optimized** ✅ - Fully responsive for 16:9 and 20:9 phone screens
+- **Performance Optimized** ✅ - Hardware acceleration, efficient rendering, minimal lag
 - **Smooth "Marquee" Progress Bar** ✅ - Animated progress indicator
 - **Ctrl+K Search Shortcut** ✅ - Quick keyboard access to search
 - **Click-Away Search Dismissal** ✅ - Search modal closes when clicking outside
 - **"upload" Keyword Shortcut** ✅ - Type "upload" in search to go directly to admin login
+- **Custom Offline Page** ✅ - Beautiful error page for offline/disconnection scenarios
 
 ## Setup Instructions
 
@@ -103,6 +143,17 @@ The application will start on `http://localhost:5000`
 - **Frontend**: Vanilla JavaScript, CSS3
 - **Security**: Werkzeug password hashing
 - **File Handling**: Secure filename generation with unique prefixes
+- **PWA Features**: Service Worker for offline support
+- **Performance**: Hardware-accelerated animations, optimized rendering
+- **Responsive Design**: Mobile-first approach with 16:9 and 20:9 screen optimizations
+
+### Mobile Optimizations
+- Responsive viewport configuration for all screen sizes
+- Touch-friendly UI elements (44px minimum touch targets)
+- Optimized font sizes and spacing for mobile readability
+- Smooth scrolling and animations without lag
+- Backdrop blur effects on supported devices
+- High DPI screen support for crisp rendering
 
 Made with <3 and a twist by Puppy pilot and @anacondy - for those who read between the logs.
 

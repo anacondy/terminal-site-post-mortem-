@@ -3,6 +3,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchModal = document.getElementById('search-modal');
     const searchInput = document.getElementById('search-input');
     
+    // Register service worker for offline support
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/static/sw.js')
+            .then(registration => console.log('Service Worker registered'))
+            .catch(err => console.log('Service Worker registration failed:', err));
+    }
+    
     // Ctrl+K to open search, Esc to close, F+S to show uploader details
     document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') { 
@@ -76,8 +83,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const line = document.createElement('div'); 
         line.innerHTML = text; 
         line.className = `line ${className}`; 
-        output.appendChild(line); 
-        window.scrollTo(0, document.body.scrollHeight); 
+        output.appendChild(line);
+        // Use requestAnimationFrame for smoother scrolling
+        requestAnimationFrame(() => {
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
+        });
     }
     
     function sleep(ms) { 
