@@ -32,6 +32,10 @@ def login_required(f):
 def terminal_ui():
     return render_template('index.html')
 
+@app.route('/offline')
+def offline():
+    return render_template('offline.html')
+
 @app.route('/admin')
 @login_required
 def upload_form():
