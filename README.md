@@ -33,27 +33,48 @@ When hosting this project on GitHub:
 - Consider external storage (AWS S3, Google Cloud Storage) for large collections
 - Each PDF should ideally be under 10 MB for optimal performance
 
+## 🚀 GitHub Pages Deployment
+
+This repository is configured to deploy automatically to GitHub Pages. The site includes:
+
+- **Static Demo Mode**: When hosted on GitHub Pages, the site runs with demo data since GitHub Pages cannot run the Python Flask backend
+- **Automatic Deployment**: Push to the `main` branch triggers automatic deployment via GitHub Actions
+- **Configuration**: Ensure GitHub Pages is enabled in repository settings:
+  1. Go to **Settings** → **Pages**
+  2. Set **Source** to "GitHub Actions"
+  3. The workflow will deploy on every push to `main`
+
+**Important Notes:**
+- GitHub Pages deployment shows a **demo version** with sample data
+- Backend features (upload, login, database) are **not available** in the static GitHub Pages version
+- To use full features, deploy the Flask application to a server that supports Python (e.g., Heroku, PythonAnywhere, AWS, etc.)
+
 ## Project Structure
 
 ```
 terminal-site-post-mortem-/
-├── app.py              # Main Flask application
+├── index.html           # Static homepage for GitHub Pages
+├── offline.html         # Static offline page
+├── app.py              # Main Flask application (for server deployment)
 ├── database.py         # Database initialization and helpers
 ├── create_admin.py     # Script to create admin users
 ├── requirements.txt    # Python dependencies
-├── templates/          # HTML templates
-│   ├── index.html      # Main terminal interface
+├── .github/            # GitHub Actions workflows
+│   └── workflows/
+│       └── deploy-pages.yml  # Auto-deploy to GitHub Pages
+├── templates/          # Flask HTML templates
+│   ├── index.html      # Main terminal interface (Flask version)
 │   ├── upload.html     # Admin multi-file upload page
 │   ├── login.html      # Admin login page
-│   └── offline.html    # Offline/error fallback page
+│   └── offline.html    # Offline/error fallback page (Flask version)
 ├── static/             # Static assets
 │   ├── style.css       # Main stylesheet with mobile optimizations
-│   ├── script.js       # Terminal UI and search logic
+│   ├── script.js       # Terminal UI and search logic (works in both modes)
 │   ├── upload.js       # Upload form logic
 │   ├── sw.js           # Service Worker for offline support
 │   └── images/         # Image assets
 │       └── offline.jpg # Offline page illustration
-└── uploads/            # Directory for uploaded PDFs
+└── uploads/            # Directory for uploaded PDFs (server deployment only)
 ```
 
 ## Features & Functionality
