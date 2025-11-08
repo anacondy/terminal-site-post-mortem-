@@ -1,10 +1,11 @@
 const CACHE_NAME = 'terminal-archives-v1';
 const urlsToCache = [
-  '/',
-  '/static/style.css',
-  '/static/script.js',
-  '/static/images/offline.jpg',
-  '/offline'
+  './',
+  './index.html',
+  './static/style.css',
+  './static/script.js',
+  './static/images/offline.jpg',
+  './offline.html'
 ];
 
 // Install service worker and cache resources
@@ -47,7 +48,7 @@ self.addEventListener('fetch', event => {
           }
         ).catch(() => {
           // If both cache and network fail, show offline page
-          return caches.match('/offline');
+          return caches.match('./offline.html');
         });
       })
   );
