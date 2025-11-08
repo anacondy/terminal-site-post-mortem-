@@ -244,9 +244,11 @@ document.addEventListener('DOMContentLoaded', function () {
     
     function handleAdminShortcut() { 
         if (demoMode) {
-            addLine('// Admin features are not available in demo mode.', 'comment');
-            addLine('// This static site is hosted on GitHub Pages and cannot run the Flask backend.', 'comment');
-            addLine('// To use admin features, deploy the Flask application on a server.', 'comment');
+            addLine('// Redirecting to Admin Login page (UI preview only)...', 'comment');
+            addLine('// Note: Backend features are not available in demo mode.', 'comment');
+            setTimeout(() => { 
+                window.location.href = 'login.html'; 
+            }, 1000);
         } else {
             addLine('// Redirecting to Admin Login page...', 'comment'); 
             setTimeout(() => { 

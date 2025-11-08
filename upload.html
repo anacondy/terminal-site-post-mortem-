@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Upload | Demo Mode</title>
+    <style>
+        :root { --primary-color: #4CAF50; --bg-color-1: #1a1a1a; --bg-color-2: #2a2a2a; --bg-color-3: #333; --border-color: #555; --text-color: #e0e0e0; --error-color: #d9534f; --warning-color: #f39c12; }
+        body { font-family: sans-serif; background-color: var(--bg-color-1); color: var(--text-color); margin: 0; padding: 2rem; }
+        .demo-notice { background-color: rgba(243, 156, 18, 0.2); border: 2px solid var(--warning-color); color: var(--warning-color); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; text-align: center; max-width: 900px; margin-left: auto; margin-right: auto; }
+        .demo-notice h2 { margin-top: 0; color: var(--warning-color); }
+        .demo-notice p { margin-bottom: 0.5rem; line-height: 1.6; }
+        .demo-notice a { color: var(--primary-color); text-decoration: none; font-weight: bold; }
+        .demo-notice a:hover { text-decoration: underline; }
+        .disabled-overlay { opacity: 0.5; pointer-events: none; }
+        .upload-container { border: 2px dashed var(--border-color); border-radius: 10px; padding: 2rem; text-align: center; color: #888; margin-bottom: 2rem; max-width: 900px; margin-left: auto; margin-right: auto; }
+        .upload-container p { font-size: 1.2rem; }
+        .upload-controls { text-align: center; margin-bottom: 2rem; }
+        #upload-all-btn { background-color: var(--primary-color); color: white; padding: 12px 25px; border: none; border-radius: 5px; font-size: 1.1rem; cursor: not-allowed; opacity: 0.6; }
+        #forms-wrapper { display: flex; gap: 1.5rem; padding-bottom: 1.5rem; overflow-x: auto; scroll-snap-type: x mandatory; max-width: 900px; margin-left: auto; margin-right: auto; }
+        .form-card { background-color: var(--bg-color-3); padding: 1.5rem; border-radius: 8px; min-width: 400px; scroll-snap-align: start; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-left: 5px solid var(--border-color); }
+        .form-card h3 { color: var(--primary-color); margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+        .status-indicator { font-size: 0.8rem; text-align: center; padding: 3px; border-radius: 3px; background-color: #555; color: white; margin-bottom: 1rem; font-weight: bold; }
+        label { display: block; margin-top: 10px; margin-bottom: 5px; color: #bbb; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 8px; margin-bottom: 8px; background-color: var(--bg-color-2); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; box-sizing: border-box; }
+        .back-link { text-align: center; margin-top: 2rem; }
+        .back-link a { color: var(--primary-color); text-decoration: none; font-size: 1.1rem; }
+        .back-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="demo-notice">
+        <h2>⚠️ Demo Mode - Upload Not Available</h2>
+        <p>This is a <strong>static demo site</strong> hosted on GitHub Pages.</p>
+        <p>File upload, database operations, and admin features require a backend server and are not available in this demo.</p>
+        <p><strong>UI Preview Below:</strong> This shows what the upload interface looks like, but functionality is disabled.</p>
+        <p><strong>To use full features:</strong> Deploy the Flask application (app.py) to Heroku, PythonAnywhere, Railway, or similar.</p>
+        <p><a href="index.html">← Back to Terminal Interface</a></p>
+    </div>
+    
+    <div class="disabled-overlay">
+        <div class="upload-container" id="drop-zone">
+            <p>Drag & Drop PDF files here</p>
+            <p>or</p>
+            <input type="file" id="file-input" multiple accept=".pdf" style="display: none;" disabled>
+            <label for="file-input" style="cursor: not-allowed; background-color: var(--primary-color); color: white; padding: 10px 15px; border-radius: 4px; opacity: 0.6;">Select Files (Disabled)</label>
+        </div>
+        <div class="upload-controls">
+            <button id="upload-all-btn" disabled>Upload All Pending Files (Disabled)</button>
+        </div>
+        <div id="forms-wrapper">
+            <!-- Sample form card to show the UI -->
+            <div class="form-card">
+                <h3>📄 Sample_Document.pdf</h3>
+                <div class="status-indicator">UI Preview Only</div>
+                
+                <label for="admin_name">Admin Name (Uploader) *</label>
+                <input type="text" name="admin_name" value="Admin User" disabled>
+                
+                <label for="class">Class *</label>
+                <input type="text" name="class" placeholder="e.g., BSc, BA, BCom" value="BSc" disabled>
+                
+                <label for="subject">Subject *</label>
+                <input type="text" name="subject" placeholder="e.g., Physics, History" value="Physics" disabled>
+                
+                <label for="semester">Semester *</label>
+                <input type="text" name="semester" placeholder="e.g., I, II, III" value="III" disabled>
+                
+                <label for="exam_year">Year *</label>
+                <input type="text" name="exam_year" value="2024" disabled>
+                
+                <label for="exam_type">Exam Type *</label>
+                <select name="exam_type" disabled>
+                    <option selected>End Semester</option>
+                    <option>Mid Semester</option>
+                    <option>Supplementary</option>
+                </select>
+                
+                <label for="medium">Medium *</label>
+                <select name="medium" disabled>
+                    <option selected>English</option>
+                    <option>Hindi</option>
+                </select>
+                
+                <label for="paper_code">Paper Code</label>
+                <input type="text" name="paper_code" placeholder="Optional" value="PHY301" disabled>
+                
+                <label for="exam_number">Exam/Paper Number</label>
+                <input type="text" name="exam_number" placeholder="Optional" disabled>
+                
+                <label for="university">University</label>
+                <input type="text" name="university" placeholder="Optional" value="Demo University" disabled>
+                
+                <label for="time">Time Duration</label>
+                <input type="text" name="time" placeholder="e.g., 3 hr" value="3 hr" disabled>
+                
+                <label for="max_marks">Maximum Marks</label>
+                <input type="text" name="max_marks" placeholder="e.g., 100" value="100" disabled>
+            </div>
+        </div>
+    </div>
+    
+    <div class="back-link">
+        <a href="index.html">← Return to Main Site</a>
+    </div>
+</body>
+</html>
