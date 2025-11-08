@@ -4,8 +4,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('search-input');
     
     // Demo data for GitHub Pages (static site) - this would normally come from the backend
-    const isGitHubPages = window.location.hostname.includes('github.io');
-    const demoMode = isGitHubPages || !window.location.hostname.includes('localhost');
+    // Use a more secure hostname check - check if it ends with github.io
+    const hostname = window.location.hostname;
+    const isGitHubPages = hostname.endsWith('.github.io') || hostname === 'github.io';
+    const demoMode = isGitHubPages || hostname !== 'localhost';
     
     const demoPapers = [
         {
