@@ -3,9 +3,74 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchModal = document.getElementById('search-modal');
     const searchInput = document.getElementById('search-input');
     
+    // Demo data for GitHub Pages (static site) - this would normally come from the backend
+    // Use a more secure hostname check - check if it ends with github.io
+    const hostname = window.location.hostname;
+    const isGitHubPages = hostname.endsWith('.github.io') || hostname === 'github.io';
+    const demoMode = isGitHubPages || hostname !== 'localhost';
+    
+    const demoPapers = [
+        {
+            id: 1,
+            class: "BSc",
+            subject: "Physics",
+            semester: "III",
+            exam_year: "2024",
+            exam_type: "End Semester",
+            paper_code: "PHY301",
+            exam_number: "2024/001",
+            medium: "English",
+            university: "Demo University",
+            time: "3 hours",
+            max_marks: "100",
+            uploader_name: "Demo Admin",
+            upload_date: "2024-01-15",
+            filename: "demo_physics_2024.pdf",
+            url: "#"
+        },
+        {
+            id: 2,
+            class: "BSc",
+            subject: "Mathematics",
+            semester: "III",
+            exam_year: "2023",
+            exam_type: "End Semester",
+            paper_code: "MATH301",
+            exam_number: "2023/002",
+            medium: "English",
+            university: "Demo University",
+            time: "3 hours",
+            max_marks: "100",
+            uploader_name: "Demo Admin",
+            upload_date: "2023-12-10",
+            filename: "demo_math_2023.pdf",
+            url: "#"
+        },
+        {
+            id: 3,
+            class: "BSc",
+            subject: "Chemistry",
+            semester: "II",
+            exam_year: "2024",
+            exam_type: "Mid Semester",
+            paper_code: "CHEM201",
+            exam_number: "2024/003",
+            medium: "English",
+            university: "Demo University",
+            time: "2 hours",
+            max_marks: "50",
+            uploader_name: "Demo Admin",
+            upload_date: "2024-03-20",
+            filename: "demo_chemistry_2024.pdf",
+            url: "#"
+        }
+    ];
+    
     // Register service worker for offline support
+    // Determine the correct path based on the environment
+    const swPath = window.location.hostname === 'localhost' ? '/static/sw.js' : './static/sw.js';
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/static/sw.js')
+        navigator.serviceWorker.register(swPath)
             .then(registration => console.log('Service Worker registered'))
             .catch(err => console.log('Service Worker registration failed:', err));
     }
@@ -57,8 +122,16 @@ document.addEventListener('DOMContentLoaded', function () {
         await showProgressBar('Searching database...', 1000);
         
         try {
-            const response = await fetch(`/api/papers?q=${encodeURIComponent(query)}`);
-            const results = await response.json();
+            let results;
+            
+            if (demoMode) {
+                // Use demo data for static GitHub Pages deployment
+                results = searchDemoPapers(query);
+            } else {
+                // Use backend API for local Flask deployment
+                const response = await fetch(`/api/papers?q=${encodeURIComponent(query)}`);
+                results = await response.json();
+            }
             
             if (results.length > 0) {
                 addLine(`Found <span class="highlight">${results.length}</span> result(s):`);
@@ -68,6 +141,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     addLine(resultHTML);
                 });
                 addLine(`<br/><span class="desktop-only">// Press F to view uploader details, Ctrl + K to search again.</span>`);
+                
+                if (demoMode) {
+                    addLine(`<br/><span class="comment">// Note: This is a demo version. Backend features (upload, login, database) are not available on GitHub Pages.</span>`);
+                }
             } else { 
                 addLine('No results found for your query.'); 
                 addLine(`<br/><span class="desktop-only">// Press Ctrl + K to search again.</span>`);
@@ -76,6 +153,46 @@ document.addEventListener('DOMContentLoaded', function () {
             addLine('// Error connecting to the search API.', 'comment'); 
             console.error('Fetch error:', error);
         }
+    }
+    
+    // Search demo papers (for static site deployment)
+    function searchDemoPapers(query) {
+        if (!query || query.trim() === '') {
+            return demoPapers;
+        }
+        
+        const searchTerms = query.toLowerCase().split(/\s+/);
+        
+        // Translation map for common shortcuts and synonyms
+        const TRANSLATION_MAP = {
+            '1': 'i', '2': 'ii', '3': 'iii', '4': 'iv', '5': 'v', '6': 'vi', '7': 'vii', '8': 'viii', '9': 'ix', '10': 'x',
+            'one': 'i', 'two': 'ii', 'three': 'iii', 'four': 'iv', 'five': 'v', 'six': 'vi', 'seven': 'vii', 'eight': 'viii',
+            'first': 'i', 'second': 'ii', 'third': 'iii', 'fourth': 'iv', 'fifth': 'v', '3rd': 'iii',
+            'sem': 'semester',
+            'phy': 'physics', 'pys': 'psychology', 'env': 'environmental', 'sci': 'science',
+            'his': 'history', 'eco': 'economics', 'stats': 'statistics', 'biotech': 'biotechnology',
+            'cs': 'computer', 'ps': 'political', 'geo': 'geography', 'zoo': 'zoology',
+            'bot': 'botany', 'eng': 'english', 'hin': 'hindi', 'chem': 'chemistry', 'math': 'mathematics'
+        };
+        
+        const processedTerms = searchTerms.map(term => TRANSLATION_MAP[term] || term);
+        
+        return demoPapers.filter(paper => {
+            const searchableText = [
+                paper.class,
+                paper.subject,
+                paper.semester,
+                paper.exam_year,
+                paper.exam_type,
+                paper.paper_code,
+                paper.exam_number,
+                paper.medium,
+                paper.university,
+                paper.uploader_name
+            ].join(' ').toLowerCase();
+            
+            return processedTerms.every(term => searchableText.includes(term));
+        });
     }
 
     // Helper functions
@@ -126,10 +243,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     function handleAdminShortcut() { 
-        addLine('// Redirecting to Admin Login page...', 'comment'); 
-        setTimeout(() => { 
-            window.location.href = '/login'; 
-        }, 1000); 
+        if (demoMode) {
+            addLine('// Redirecting to Admin Login page (UI preview only)...', 'comment');
+            addLine('// Note: Backend features are not available in demo mode.', 'comment');
+            setTimeout(() => { 
+                window.location.href = 'login.html'; 
+            }, 1000);
+        } else {
+            addLine('// Redirecting to Admin Login page...', 'comment'); 
+            setTimeout(() => { 
+                window.location.href = '/login'; 
+            }, 1000); 
+        }
     }
     
     // Show uploader details with blur effect
@@ -191,11 +316,21 @@ document.addEventListener('DOMContentLoaded', function () {
         await showProgressBar('Connecting to archives...', 1500); 
         
         try { 
-            const response = await fetch('/api/papers'); 
-            const papers = await response.json(); 
-            addLine(`// Connected. <span class="highlight">${papers.length}</span> papers found in the database.`); 
+            let papers;
+            if (demoMode) {
+                // Use demo data for GitHub Pages
+                papers = demoPapers;
+                addLine(`// Connected. <span class="highlight">${papers.length}</span> demo papers found in the database.`);
+                addLine('// <span class="highlight">Demo Mode:</span> This is a static preview. Backend features are not available.', 'comment');
+            } else {
+                // Use backend API for local Flask deployment
+                const response = await fetch('/api/papers'); 
+                papers = await response.json(); 
+                addLine(`// Connected. <span class="highlight">${papers.length}</span> papers found in the database.`);
+            }
         } catch (error) { 
-            addLine('// Connection to archives failed.', 'comment'); 
+            addLine('// Connection to archives failed. Running in demo mode.', 'comment'); 
+            addLine(`// Demo Mode: <span class="highlight">${demoPapers.length}</span> demo papers available.`);
             console.error('Fetch error:', error); 
         }
         

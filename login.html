@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login | Demo Mode</title>
+    <style>
+        :root { --primary-color: #4CAF50; --bg-color-1: #1a1a1a; --bg-color-2: #2a2a2a; --bg-color-3: #333; --border-color: #555; --text-color: #e0e0e0; --error-color: #d9534f; --warning-color: #f39c12; }
+        body { font-family: sans-serif; background-color: var(--bg-color-1); color: var(--text-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { max-width: 500px; width: 100%; padding: 1rem; }
+        .demo-notice { background-color: rgba(243, 156, 18, 0.2); border: 2px solid var(--warning-color); color: var(--warning-color); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; text-align: center; }
+        .demo-notice h2 { margin-top: 0; color: var(--warning-color); }
+        .demo-notice p { margin-bottom: 0.5rem; line-height: 1.6; }
+        .demo-notice a { color: var(--primary-color); text-decoration: none; font-weight: bold; }
+        .demo-notice a:hover { text-decoration: underline; }
+        form { background-color: var(--bg-color-3); padding: 2rem 3rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; opacity: 0.6; pointer-events: none; }
+        h1 { color: var(--primary-color); }
+        label { display: block; text-align: left; margin-top: 15px; margin-bottom: 5px; color: #bbb; }
+        input { width: 100%; padding: 10px; margin-bottom: 10px; background-color: var(--bg-color-2); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; box-sizing: border-box; }
+        input[type="submit"] { background-color: var(--primary-color); color: white; border: none; cursor: pointer; margin-top: 20px; font-weight: bold; }
+        .back-link { text-align: center; margin-top: 1rem; }
+        .back-link a { color: var(--primary-color); text-decoration: none; }
+        .back-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="demo-notice">
+            <h2>⚠️ Demo Mode - Login Not Available</h2>
+            <p>This is a <strong>static demo site</strong> hosted on GitHub Pages.</p>
+            <p>Admin login and database features require a backend server and are not available in this demo.</p>
+            <p><strong>To use full features:</strong> Deploy the Flask application (app.py) to a Python-compatible hosting service like Heroku, PythonAnywhere, or Railway.</p>
+            <p><a href="index.html">← Back to Terminal Interface</a></p>
+        </div>
+        
+        <form>
+            <h1>Admin Login</h1>
+            <p style="color: #888; font-size: 0.9rem;">(UI Preview Only)</p>
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" value="admin" disabled>
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" value="••••••••" disabled>
+            <input type="submit" value="Log In (Disabled)" disabled>
+        </form>
+        
+        <div class="back-link">
+            <a href="index.html">← Return to Main Site</a>
+        </div>
+    </div>
+</body>
+</html>
