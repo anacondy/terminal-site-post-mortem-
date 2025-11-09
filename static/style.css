@@ -176,6 +176,17 @@ body {
     }
 }
 
+@keyframes slideUp {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
 .search-box label { 
     display: block; 
     color: var(--primary-color); 
@@ -294,9 +305,21 @@ body {
         line-height: 1.5;
     }
     
+    /* Mobile: Position search modal at bottom */
+    #search-modal {
+        align-items: flex-end;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    
     .search-box {
         padding: 1.5rem;
-        width: 95vw;
+        width: 100vw;
+        max-width: 100vw;
+        border-radius: 20px 20px 0 0;
+        border-bottom: none;
+        animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.8);
     }
     
     .search-box label {
@@ -306,6 +329,7 @@ body {
     .search-box input {
         font-size: 0.95rem;
         padding: 12px;
+        border-radius: 8px;
     }
     
     .search-result {
@@ -331,6 +355,11 @@ body {
     .desktop-only {
         display: none;
     }
+    
+    /* Show mobile-only hints */
+    .mobile-only {
+        display: block !important;
+    }
 }
 
 /* Optimizations for ultra-wide phones (20:9 aspect ratio) */
@@ -343,13 +372,16 @@ body {
         font-size: 0.85rem;
     }
     
-    .search-box {
-        padding: 1rem;
-        padding-top: 10vh;
+    /* Keep bottom positioning for 20:9 screens */
+    #search-modal {
+        align-items: flex-end;
+        padding-top: 0;
     }
     
-    #search-modal {
-        padding-top: 10vh;
+    .search-box {
+        padding: 1.25rem;
+        border-radius: 20px 20px 0 0;
+        animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 }
 
@@ -357,6 +389,17 @@ body {
 @media (max-width: 480px) {
     body {
         padding: 1rem;
+    }
+    
+    /* Bottom positioning for 16:9 screens */
+    #search-modal {
+        align-items: flex-end;
+        padding-top: 0;
+    }
+    
+    .search-box {
+        border-radius: 20px 20px 0 0;
+        animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
     
     .search-box input {
