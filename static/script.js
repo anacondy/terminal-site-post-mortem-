@@ -3,6 +3,26 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchModal = document.getElementById('search-modal');
     const searchInput = document.getElementById('search-input');
     
+    // Detect mobile device and add class to body for better styling control
+    function detectMobileDevice() {
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isSmallScreen = window.innerWidth <= 768;
+        const aspectRatio = window.innerWidth / window.innerHeight;
+        
+        // Check for common mobile aspect ratios: 16:9 (1.78), 20:9 (2.22), 18:9 (2.0)
+        const isMobileAspectRatio = aspectRatio >= 0.4 && aspectRatio <= 0.6; // Portrait mode
+        
+        if ((isMobile || isSmallScreen) && (isMobileAspectRatio || isSmallScreen)) {
+            document.body.classList.add('mobile-device');
+        } else {
+            document.body.classList.remove('mobile-device');
+        }
+    }
+    
+    // Run detection on load and resize
+    detectMobileDevice();
+    window.addEventListener('resize', detectMobileDevice);
+    
     // Demo data for GitHub Pages (static site) - this would normally come from the backend
     // Use a more secure hostname check - check if it ends with github.io
     const hostname = window.location.hostname;
@@ -340,7 +360,22 @@ document.addEventListener('DOMContentLoaded', function () {
         await fetchDeviceInfo(); 
         await sleep(500); 
         addLine('<span class="prompt">system@archives:~$</span> <span class="command">ready</span>'); 
-        addLine(`System ready. <span class="desktop-only">Press Ctrl + K to search the database.</span>`); 
+        
+        // Show appropriate hint based on device type
+        if (document.body.classList.contains('mobile-device')) {
+            addLine(`System ready. Tap anywhere to search the database.`);
+            // Add click handler for mobile to open search
+            document.body.addEventListener('click', function mobileSearchTrigger(e) {
+                // Don't trigger if clicking on links or inside search modal
+                if (e.target.tagName !== 'A' && !e.target.closest('#search-modal') && searchModal.classList.contains('hidden')) {
+                    searchModal.classList.remove('hidden');
+                    searchInput.focus();
+                    searchInput.value = '';
+                }
+            }, { once: true }); // Only trigger once, then user can use Ctrl+K
+        } else {
+            addLine(`System ready. <span class="desktop-only">Press Ctrl + K to search the database.</span>`);
+        }
     }
     
     // Event listeners
