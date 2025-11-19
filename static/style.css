@@ -142,6 +142,8 @@ body {
     opacity: 0;
     transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
     pointer-events: none;
+    /* Improve performance */
+    will-change: opacity;
 }
 
 #search-modal:not(.hidden) {
@@ -163,6 +165,10 @@ body {
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     transform: translateY(-20px);
     animation: slideDown 0.3s ease forwards;
+    /* Improve rendering performance */
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 
 @keyframes slideDown {
@@ -305,21 +311,27 @@ body {
         line-height: 1.5;
     }
     
-    /* Mobile: Position search modal at bottom */
+    /* Mobile: Position search modal at bottom for better UX */
     #search-modal {
         align-items: flex-end;
         padding-top: 0;
-        padding-bottom: 0;
+        padding-bottom: env(safe-area-inset-bottom, 0);
+        padding-left: env(safe-area-inset-left, 0);
+        padding-right: env(safe-area-inset-right, 0);
     }
     
     .search-box {
         padding: 1.5rem;
+        padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0));
         width: 100vw;
         max-width: 100vw;
         border-radius: 20px 20px 0 0;
         border-bottom: none;
         animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.8);
+        /* Improve performance with GPU acceleration */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
     }
     
     .search-box label {
@@ -330,6 +342,8 @@ body {
         font-size: 0.95rem;
         padding: 12px;
         border-radius: 8px;
+        /* Prevent zoom on iOS with minimum font size */
+        font-size: max(16px, 0.95rem);
     }
     
     .search-result {
@@ -362,48 +376,58 @@ body {
     }
 }
 
-/* Optimizations for ultra-wide phones (20:9 aspect ratio) */
-@media (max-width: 480px) and (min-aspect-ratio: 9/20) {
+/* Optimizations for ultra-wide phones (20:9 aspect ratio - e.g., Galaxy S20, OnePlus) */
+@media (max-width: 480px) and (min-aspect-ratio: 9/20), (max-aspect-ratio: 9/21) {
     body {
         padding: 0.75rem;
+        padding-bottom: env(safe-area-inset-bottom, 0.75rem);
     }
     
     .line {
         font-size: 0.85rem;
     }
     
-    /* Keep bottom positioning for 20:9 screens */
+    /* Keep bottom positioning for 20:9 screens - critical for UX */
     #search-modal {
         align-items: flex-end;
         padding-top: 0;
+        padding-bottom: env(safe-area-inset-bottom, 0);
     }
     
     .search-box {
         padding: 1.25rem;
+        padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0));
         border-radius: 20px 20px 0 0;
         animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        /* Hardware acceleration for smoother animations */
+        will-change: transform;
+        transform: translateZ(0);
     }
 }
 
-/* Standard 16:9 phones */
+/* Standard 16:9 phones (iPhone, Pixel, etc.) */
 @media (max-width: 480px) {
     body {
         padding: 1rem;
+        padding-bottom: env(safe-area-inset-bottom, 1rem);
     }
     
-    /* Bottom positioning for 16:9 screens */
+    /* Bottom positioning for 16:9 screens - essential for thumb reach */
     #search-modal {
         align-items: flex-end;
         padding-top: 0;
+        padding-bottom: env(safe-area-inset-bottom, 0);
     }
     
     .search-box {
         border-radius: 20px 20px 0 0;
         animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0));
     }
     
     .search-box input {
-        font-size: 16px; /* Prevents zoom on iOS */
+        /* Prevent zoom on iOS - critical for UX */
+        font-size: max(16px, 0.95rem);
     }
     
     .uploader-details-box {
@@ -470,4 +494,49 @@ html {
     .search-box input {
         min-height: 44px; /* iOS recommended touch target */
     }
+}
+
+/* Mobile search button - appears on mobile devices for better discoverability */
+.mobile-search-button {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    z-index: 999;
+    transition: all 0.3s ease;
+    will-change: transform;
+}
+
+.mobile-search-button::before {
+    content: '🔍';
+    font-size: 24px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.mobile-search-button:active {
+    transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+    .mobile-search-button {
+        display: block;
+        bottom: calc(20px + env(safe-area-inset-bottom, 0));
+        right: calc(20px + env(safe-area-inset-right, 0));
+    }
+}
+
+/* Hide button when search is open */
+#search-modal:not(.hidden) ~ .mobile-search-button {
+    opacity: 0;
+    pointer-events: none;
 }

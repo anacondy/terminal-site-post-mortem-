@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <meta name="description" content="Terminal Archives - Search and access previous year exam papers with an intelligent terminal-style interface">
     <meta name="theme-color" content="#4CAF50">
     <title>Terminal | Previous Year Papers</title>
@@ -19,11 +19,14 @@
     <div id="search-modal" class="hidden">
         <div class="search-box">
             <label for="search-input">Search Database <span class="desktop-only">(Ctrl+K)</span></label>
-            <input type="text" id="search-input" placeholder="e.g., Physics 2024">
+            <input type="text" id="search-input" placeholder="e.g., Physics 2024" autocomplete="off">
             <p class="desktop-only">Press Enter to search, Esc to close.</p>
             <p class="mobile-only" style="display: none;">Press Enter to search, tap outside to close.</p>
         </div>
     </div>
+    
+    <button class="mobile-search-button" aria-label="Open search" title="Search papers"></button>
+    
     <script src="static/script.js"></script>
 </body>
 </html>

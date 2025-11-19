@@ -3,32 +3,54 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchModal = document.getElementById('search-modal');
     const searchInput = document.getElementById('search-input');
     
-    // Detect mobile device and add class to body for better styling control
+    // Configuration constants
+    const CONFIG = {
+        DEMO_MODE_DOMAINS: ['.github.io', 'github.io'],
+        SEARCH_DEBOUNCE_MS: 300,
+        ANIMATION_DURATION_MS: 1000,
+        MOBILE_BREAKPOINT: 768
+    };
+    
+    /**
+     * Detect if the user is on a mobile device
+     * Checks both user agent and screen dimensions
+     */
     function detectMobileDevice() {
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        const isSmallScreen = window.innerWidth <= 768;
+        const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isSmallScreen = window.innerWidth <= CONFIG.MOBILE_BREAKPOINT;
         const aspectRatio = window.innerWidth / window.innerHeight;
         
-        // Check for common mobile aspect ratios: 16:9 (1.78), 20:9 (2.22), 18:9 (2.0)
-        const isMobileAspectRatio = aspectRatio >= 0.4 && aspectRatio <= 0.6; // Portrait mode
+        // Check for mobile aspect ratios in portrait mode (16:9, 18:9, 20:9)
+        const isMobileAspectRatio = aspectRatio >= 0.4 && aspectRatio <= 0.6;
         
-        if ((isMobile || isSmallScreen) && (isMobileAspectRatio || isSmallScreen)) {
+        if ((isMobileUA || isSmallScreen) && (isMobileAspectRatio || isSmallScreen)) {
             document.body.classList.add('mobile-device');
         } else {
             document.body.classList.remove('mobile-device');
         }
     }
     
-    // Run detection on load and resize
+    // Run detection on load and resize with debounce
+    let resizeTimeout;
     detectMobileDevice();
-    window.addEventListener('resize', detectMobileDevice);
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(detectMobileDevice, 100);
+    });
     
-    // Demo data for GitHub Pages (static site) - this would normally come from the backend
-    // Use a more secure hostname check - check if it ends with github.io
+    /**
+     * Determine if the site is in demo mode
+     * Demo mode is used for static GitHub Pages deployment or simple HTTP server
+     */
     const hostname = window.location.hostname;
-    const isGitHubPages = hostname.endsWith('.github.io') || hostname === 'github.io';
-    const demoMode = isGitHubPages || hostname !== 'localhost';
+    const isGitHubPages = CONFIG.DEMO_MODE_DOMAINS.some(domain => 
+        hostname.endsWith(domain) || hostname === domain.replace('.', '')
+    );
+    // Check if Flask backend is available by looking at port and path
+    const isStaticServer = window.location.port === '8080' || window.location.pathname.includes('.html');
+    const demoMode = isGitHubPages || isStaticServer || (hostname !== 'localhost' && hostname !== '127.0.0.1');
     
+    // Demo data for static site deployment (GitHub Pages)
     const demoPapers = [
         {
             id: 1,
@@ -86,34 +108,37 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     ];
     
-    // Register service worker for offline support
-    // Determine the correct path based on the environment
+    /**
+     * Register service worker for offline support
+     * Uses correct path based on environment
+     */
     const swPath = window.location.hostname === 'localhost' ? '/static/sw.js' : './static/sw.js';
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register(swPath)
             .then(registration => console.log('Service Worker registered'))
-            .catch(err => console.log('Service Worker registration failed:', err));
+            .catch(err => console.error('Service Worker registration failed:', err));
     }
     
-    // Ctrl+K to open search, Esc to close, F+S to show uploader details
+    /**
+     * Global keyboard shortcuts
+     * - Ctrl+K / Cmd+K: Open search modal
+     * - Escape: Close modals
+     * - F: Show uploader details
+     */
     document.addEventListener('keydown', (e) => {
+        // Open search: Ctrl/Cmd + K
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') { 
             e.preventDefault(); 
-            searchModal.classList.remove('hidden'); 
-            searchInput.focus(); 
-            searchInput.value = ''; 
+            openSearchModal();
         }
+        
+        // Close modals: Escape
         if (e.key === 'Escape') { 
-            if (!searchModal.classList.contains('hidden')) { 
-                searchModal.classList.add('hidden'); 
-            }
-            // Close uploader details modal if open
-            const detailsModal = document.getElementById('uploader-details-modal');
-            if (detailsModal && !detailsModal.classList.contains('hidden')) {
-                detailsModal.classList.add('hidden');
-            }
+            closeSearchModal();
+            closeUploaderDetailsModal();
         }
-        // F+S shortcut to show uploader details for paper links
+        
+        // Show uploader details: F key
         if (e.key === 'f' || e.key === 'F') {
             const paperLinks = document.querySelectorAll('.paper-link');
             if (paperLinks.length > 0) {
@@ -123,59 +148,116 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Click outside search box to close
+    /**
+     * Open search modal with smooth animation
+     */
+    function openSearchModal() {
+        searchModal.classList.remove('hidden');
+        // Use requestAnimationFrame for smooth focus
+        requestAnimationFrame(() => {
+            searchInput.focus();
+            searchInput.value = '';
+        });
+    }
+
+    /**
+     * Close search modal
+     */
+    function closeSearchModal() {
+        if (!searchModal.classList.contains('hidden')) {
+            searchModal.classList.add('hidden');
+        }
+    }
+
+    /**
+     * Close uploader details modal
+     */
+    function closeUploaderDetailsModal() {
+        const detailsModal = document.getElementById('uploader-details-modal');
+        if (detailsModal && !detailsModal.classList.contains('hidden')) {
+            detailsModal.classList.add('hidden');
+        }
+    }
+
+    /**
+     * Click outside search box to close
+     */
     searchModal.addEventListener('click', (e) => {
         if (e.target === searchModal) {
-            searchModal.classList.add('hidden');
+            closeSearchModal();
         }
     });
 
-    // Perform search with intelligent translation
+    /**
+     * Perform intelligent search with translation
+     * Supports shortcuts like "phy" -> "physics", "3rd" -> "III"
+     */
     async function performSearch(query) {
+        // Sanitize input
+        const sanitizedQuery = query.trim();
+        
         // Special shortcut: "upload" redirects to admin login
-        if (query.trim().toLowerCase() === 'upload') { 
+        if (sanitizedQuery.toLowerCase() === 'upload') { 
             handleAdminShortcut(); 
             return; 
         }
         
-        addLine(`<span class="prompt">user@archives:~$</span> <span class="command">search --query="${query}"</span>`);
-        await showProgressBar('Searching database...', 1000);
+        if (!sanitizedQuery) {
+            addLine('// Please enter a search term.', 'comment');
+            return;
+        }
+        
+        addLine(`<span class="prompt">user@archives:~$</span> <span class="command">search --query="${sanitizedQuery}"</span>`);
+        await showProgressBar('Searching database...', CONFIG.ANIMATION_DURATION_MS);
         
         try {
             let results;
             
             if (demoMode) {
                 // Use demo data for static GitHub Pages deployment
-                results = searchDemoPapers(query);
+                results = searchDemoPapers(sanitizedQuery);
             } else {
                 // Use backend API for local Flask deployment
-                const response = await fetch(`/api/papers?q=${encodeURIComponent(query)}`);
+                const response = await fetch(`/api/papers?q=${encodeURIComponent(sanitizedQuery)}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 results = await response.json();
             }
             
-            if (results.length > 0) {
-                addLine(`Found <span class="highlight">${results.length}</span> result(s):`);
-                results.forEach(paper => {
-                    const title = `${paper.class} ${paper.subject} (Sem ${paper.semester}) - ${paper.exam_year}`;
-                    const resultHTML = `<div class="search-result"><span>[${paper.exam_year}]</span> <a href="${paper.url}" class="paper-link" target="_blank" data-uploader="${paper.uploader_name}" data-date="${paper.upload_date}">${title}</a></div>`;
-                    addLine(resultHTML);
-                });
-                addLine(`<br/><span class="desktop-only">// Press F to view uploader details, Ctrl + K to search again.</span>`);
-                
-                if (demoMode) {
-                    addLine(`<br/><span class="comment">// Note: This is a demo version. Backend features (upload, login, database) are not available on GitHub Pages.</span>`);
-                }
-            } else { 
-                addLine('No results found for your query.'); 
-                addLine(`<br/><span class="desktop-only">// Press Ctrl + K to search again.</span>`);
-            }
+            displaySearchResults(results);
         } catch (error) { 
             addLine('// Error connecting to the search API.', 'comment'); 
-            console.error('Fetch error:', error);
+            console.error('Search error:', error);
         }
     }
     
-    // Search demo papers (for static site deployment)
+    /**
+     * Display search results in terminal
+     */
+    function displaySearchResults(results) {
+        if (results.length > 0) {
+            addLine(`Found <span class="highlight">${results.length}</span> result(s):`);
+            results.forEach(paper => {
+                const title = `${paper.class} ${paper.subject} (Sem ${paper.semester}) - ${paper.exam_year}`;
+                const resultHTML = `<div class="search-result"><span>[${paper.exam_year}]</span> <a href="${paper.url}" class="paper-link" target="_blank" data-uploader="${paper.uploader_name}" data-date="${paper.upload_date}">${title}</a></div>`;
+                addLine(resultHTML);
+            });
+            addLine(`<br/><span class="desktop-only">// Press F to view uploader details, Ctrl + K to search again.</span>`);
+            
+            if (demoMode) {
+                addLine(`<br/><span class="comment">// Note: This is a demo version. Backend features (upload, login, database) are not available on GitHub Pages.</span>`);
+            }
+        } else { 
+            addLine('No results found for your query.'); 
+            addLine(`<br/><span class="desktop-only">// Press Ctrl + K to search again.</span>`);
+        }
+    }
+    
+    /**
+     * Search demo papers with intelligent translation
+     * Used for static site deployment (GitHub Pages)
+     */
     function searchDemoPapers(query) {
         if (!query || query.trim() === '') {
             return demoPapers;
@@ -185,14 +267,18 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Translation map for common shortcuts and synonyms
         const TRANSLATION_MAP = {
-            '1': 'i', '2': 'ii', '3': 'iii', '4': 'iv', '5': 'v', '6': 'vi', '7': 'vii', '8': 'viii', '9': 'ix', '10': 'x',
-            'one': 'i', 'two': 'ii', 'three': 'iii', 'four': 'iv', 'five': 'v', 'six': 'vi', 'seven': 'vii', 'eight': 'viii',
-            'first': 'i', 'second': 'ii', 'third': 'iii', 'fourth': 'iv', 'fifth': 'v', '3rd': 'iii',
+            '1': 'i', '2': 'ii', '3': 'iii', '4': 'iv', '5': 'v', '6': 'vi', 
+            '7': 'vii', '8': 'viii', '9': 'ix', '10': 'x',
+            'one': 'i', 'two': 'ii', 'three': 'iii', 'four': 'iv', 'five': 'v', 
+            'six': 'vi', 'seven': 'vii', 'eight': 'viii',
+            'first': 'i', 'second': 'ii', 'third': 'iii', 'fourth': 'iv', 'fifth': 'v', 
+            '3rd': 'iii', '1st': 'i', '2nd': 'ii',
             'sem': 'semester',
             'phy': 'physics', 'pys': 'psychology', 'env': 'environmental', 'sci': 'science',
             'his': 'history', 'eco': 'economics', 'stats': 'statistics', 'biotech': 'biotechnology',
             'cs': 'computer', 'ps': 'political', 'geo': 'geography', 'zoo': 'zoology',
-            'bot': 'botany', 'eng': 'english', 'hin': 'hindi', 'chem': 'chemistry', 'math': 'mathematics'
+            'bot': 'botany', 'eng': 'english', 'hin': 'hindi', 'chem': 'chemistry', 
+            'math': 'mathematics', 'maths': 'mathematics'
         };
         
         const processedTerms = searchTerms.map(term => TRANSLATION_MAP[term] || term);
@@ -215,13 +301,16 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Helper functions
+    /**
+     * Helper: Add a line to terminal output with smooth animation
+     */
     function addLine(text, className = '') { 
         const line = document.createElement('div'); 
         line.innerHTML = text; 
         line.className = `line ${className}`; 
         output.appendChild(line);
-        // Use requestAnimationFrame for smoother scrolling
+        
+        // Smooth scroll to bottom using requestAnimationFrame
         requestAnimationFrame(() => {
             window.scrollTo({
                 top: document.body.scrollHeight,
@@ -230,10 +319,16 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     
+    /**
+     * Helper: Sleep/delay function
+     */
     function sleep(ms) { 
         return new Promise(resolve => setTimeout(resolve, ms)); 
     }
     
+    /**
+     * Helper: Show animated progress bar
+     */
     async function showProgressBar(text, duration) { 
         const line = document.createElement('div'); 
         line.className = 'line progress-bar-container'; 
@@ -243,6 +338,9 @@ document.addEventListener('DOMContentLoaded', function () {
         line.remove(); 
     }
     
+    /**
+     * Fetch and display device information
+     */
     async function fetchDeviceInfo() { 
         addLine('Device Information:'); 
         const cores = navigator.hardwareConcurrency || 'N/A'; 
@@ -251,10 +349,15 @@ document.addEventListener('DOMContentLoaded', function () {
         addLine(`  - Device Memory (RAM): <span class="highlight">${memory}</span>`); 
         
         if (navigator.storage && navigator.storage.estimate) { 
-            const estimate = await navigator.storage.estimate(); 
-            const usageMB = (estimate.usage / 1024 / 1024).toFixed(2); 
-            const quotaMB = (estimate.quota / 1024 / 1024).toFixed(2); 
-            addLine(`  - Browser Storage Quota: <span class="highlight">${usageMB} MB used / ${quotaMB} MB total</span>`); 
+            try {
+                const estimate = await navigator.storage.estimate(); 
+                const usageMB = (estimate.usage / 1024 / 1024).toFixed(2); 
+                const quotaMB = (estimate.quota / 1024 / 1024).toFixed(2); 
+                addLine(`  - Browser Storage Quota: <span class="highlight">${usageMB} MB used / ${quotaMB} MB total</span>`); 
+            } catch (error) {
+                addLine('  - Browser Storage: Unable to estimate.');
+                console.error('Storage estimate error:', error);
+            }
         } else { 
             addLine('  - Browser Storage: API not supported.'); 
         }
@@ -262,6 +365,9 @@ document.addEventListener('DOMContentLoaded', function () {
         addLine('// Note: Browser security prevents access to total disk space or system RAM.', 'comment'); 
     }
     
+    /**
+     * Handle admin upload shortcut
+     */
     function handleAdminShortcut() { 
         if (demoMode) {
             addLine('// Redirecting to Admin Login page (UI preview only)...', 'comment');
@@ -277,7 +383,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
-    // Show uploader details with blur effect
+    /**
+     * Show uploader details modal with blur effect
+     */
     function showUploaderDetails() {
         const paperLinks = document.querySelectorAll('.paper-link');
         if (paperLinks.length === 0) return;
@@ -291,19 +399,23 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.appendChild(detailsModal);
         }
         
-        // Build details content
+        // Build details content with XSS protection
         let detailsHTML = '<div class="uploader-details-box"><h3>Paper Upload Details</h3>';
         paperLinks.forEach((link, index) => {
-            const uploader = link.getAttribute('data-uploader') || 'Unknown';
+            const uploader = escapeHtml(link.getAttribute('data-uploader') || 'Unknown');
             const uploadDate = link.getAttribute('data-date') || 'Unknown';
-            const title = link.textContent.trim();
+            const title = escapeHtml(link.textContent.trim());
             
-            // Parse date to show month and year
+            // Parse and format date
             let displayDate = 'Unknown';
             if (uploadDate && uploadDate !== 'Unknown') {
-                const date = new Date(uploadDate);
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                displayDate = `${months[date.getMonth()]} ${date.getFullYear()}`;
+                try {
+                    const date = new Date(uploadDate);
+                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    displayDate = `${months[date.getMonth()]} ${date.getFullYear()}`;
+                } catch (e) {
+                    displayDate = 'Unknown';
+                }
             }
             
             detailsHTML += `
@@ -316,7 +428,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             `;
         });
-        detailsHTML += '<p class="modal-hint">Press Esc to close</p></div>';
+        detailsHTML += '<p class="modal-hint">Press Esc to close or click outside</p></div>';
         
         detailsModal.innerHTML = detailsHTML;
         detailsModal.classList.remove('hidden');
@@ -329,7 +441,18 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     
-    // Startup sequence
+    /**
+     * Escape HTML to prevent XSS attacks
+     */
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    /**
+     * Application startup sequence
+     */
     async function start() { 
         addLine('// Welcome to the Terminal Archives.', 'comment'); 
         await sleep(500); 
@@ -345,13 +468,16 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 // Use backend API for local Flask deployment
                 const response = await fetch('/api/papers'); 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 papers = await response.json(); 
                 addLine(`// Connected. <span class="highlight">${papers.length}</span> papers found in the database.`);
             }
         } catch (error) { 
             addLine('// Connection to archives failed. Running in demo mode.', 'comment'); 
             addLine(`// Demo Mode: <span class="highlight">${demoPapers.length}</span> demo papers available.`);
-            console.error('Fetch error:', error); 
+            console.error('Connection error:', error); 
         }
         
         await sleep(500); 
@@ -364,28 +490,41 @@ document.addEventListener('DOMContentLoaded', function () {
         // Show appropriate hint based on device type
         if (document.body.classList.contains('mobile-device')) {
             addLine(`System ready. Tap anywhere to search the database.`);
-            // Add click handler for mobile to open search
+            // Add one-time click handler for mobile to open search
             document.body.addEventListener('click', function mobileSearchTrigger(e) {
                 // Don't trigger if clicking on links or inside search modal
-                if (e.target.tagName !== 'A' && !e.target.closest('#search-modal') && searchModal.classList.contains('hidden')) {
-                    searchModal.classList.remove('hidden');
-                    searchInput.focus();
-                    searchInput.value = '';
+                if (e.target.tagName !== 'A' && 
+                    !e.target.closest('#search-modal') && 
+                    searchModal.classList.contains('hidden')) {
+                    openSearchModal();
                 }
-            }, { once: true }); // Only trigger once, then user can use Ctrl+K
+            }, { once: true });
         } else {
             addLine(`System ready. <span class="desktop-only">Press Ctrl + K to search the database.</span>`);
         }
     }
     
-    // Event listeners
+    /**
+     * Search input event handler
+     */
     searchInput.addEventListener('keydown', (e) => { 
         if (e.key === 'Enter') { 
             e.preventDefault(); 
-            searchModal.classList.add('hidden'); 
+            closeSearchModal();
             performSearch(searchInput.value); 
         } 
     });
+    
+    /**
+     * Mobile search button handler
+     */
+    const mobileSearchButton = document.querySelector('.mobile-search-button');
+    if (mobileSearchButton) {
+        mobileSearchButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            openSearchModal();
+        });
+    }
     
     // Start the application
     start();
