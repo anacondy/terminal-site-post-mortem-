@@ -40,13 +40,15 @@ document.addEventListener('DOMContentLoaded', function () {
     
     /**
      * Determine if the site is in demo mode
-     * Demo mode is used for static GitHub Pages deployment
+     * Demo mode is used for static GitHub Pages deployment or simple HTTP server
      */
     const hostname = window.location.hostname;
     const isGitHubPages = CONFIG.DEMO_MODE_DOMAINS.some(domain => 
         hostname.endsWith(domain) || hostname === domain.replace('.', '')
     );
-    const demoMode = isGitHubPages || (hostname !== 'localhost' && hostname !== '127.0.0.1');
+    // Check if Flask backend is available by looking at port and path
+    const isStaticServer = window.location.port === '8080' || window.location.pathname.includes('.html');
+    const demoMode = isGitHubPages || isStaticServer || (hostname !== 'localhost' && hostname !== '127.0.0.1');
     
     // Demo data for static site deployment (GitHub Pages)
     const demoPapers = [
